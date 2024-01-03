@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------------------------------
+Version: 0.1.0
+Date: 03. 01. 2023
+  Major Features:
+    - Item Vault pop-up to select starting items for new characters
