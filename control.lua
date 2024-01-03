@@ -13,10 +13,14 @@ local function cleanup(player)
     -- Clear the globals
     global.selected_item_name = nil
     global.inventory_items = {}
+    global.dcs_gui_active = false
 end
 
 -- This function is called when the game starts
 script.on_init(function()
+    -- Initialize the GUI active flag
+    global.dcs_gui_active = false
+
     -- Store the initial tick count
     global.initial_tick = game.tick
 
@@ -82,6 +86,19 @@ end)
 
 -- Register the on_gui_click event
 script.on_event(defines.events.on_gui_click, function(event)
+    -- Check if the GUI is active
+    if not global.dcs_gui_active then
+        return
+    end
+
+    -- Get the clicked element
+    local element = event.element
+
+    -- Check if the clicked element is part of your GUI
+    if not element.valid or not element.name:find("dcs_") then
+        return
+    end
+
     -- Get the player who clicked the button
     local player = game.players[event.player_index]
 
@@ -212,3 +229,11 @@ script.on_event(
         end
     end
 )
+
+-- This function is called when the game's configuration changes
+script.on_configuration_changed(function()
+    -- Initialize the GUI active flag if it is nil
+    if global.dcs_gui_active == nil then
+        global.dcs_gui_active = false
+    end
+end)

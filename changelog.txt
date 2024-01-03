@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.1.2
+Date: 03. 01. 2023
+  Bugfix:
+    - Fixed issue where other gui click events tried triggering already destroyed gui elements causing a crash
+---------------------------------------------------------------------------------------------------
 Version: 0.1.1
 Date: 03. 01. 2023
   Tweak:

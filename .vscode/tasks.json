@@ -4,7 +4,7 @@
         {
             "label": "Package and Copy Mod",
             "type": "shell",
-            "command": "powershell -Command {$dir = Split-Path -Path (Get-Location) -Leaf; $version = '0.1.0'; $newDir = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(), $dir + '_' + $version); New-Item -ItemType Directory -Force -Path $newDir; Copy-Item -Path ./* -Destination $newDir -Recurse -Force; $zipName = $newDir + '.zip'; Compress-Archive -Path $newDir -DestinationPath $zipName -Force; Move-Item -Path $zipName -Destination ${env:APPDATA}/Factorio/mods/ -Force; Remove-Item -Path $newDir -Recurse -Force}",
+            "command": "powershell -Command {$dir = Split-Path -Path (Get-Location) -Leaf; $version = '0.1.2'; $newDir = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(), $dir + '_' + $version); New-Item -ItemType Directory -Force -Path $newDir; Copy-Item -Path ./* -Destination $newDir -Recurse -Force; $zipName = $newDir + '.zip'; Compress-Archive -Path $newDir -DestinationPath $zipName -Force; Move-Item -Path $zipName -Destination ${env:APPDATA}/Factorio/mods/ -Force; Remove-Item -Path $newDir -Recurse -Force}",
             "group": {
                 "kind": "build",
                 "isDefault": true

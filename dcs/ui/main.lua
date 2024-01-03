@@ -2,6 +2,9 @@
 
 -- Function to create the GUI
 function create_gui(player, inventory_items)
+    -- Set the GUI active flag
+    global.dcs_gui_active = true
+
     -- Get the screen GUI root
     local screen_element = player.gui.screen
 
