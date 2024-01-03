@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.1.1
+Date: 03. 01. 2023
+  Tweak:
+    - Changed the folder name in the .zip to match the .zip name with version number to follow convention
+---------------------------------------------------------------------------------------------------
 Version: 0.1.0
 Date: 03. 01. 2023
   Major Features:
