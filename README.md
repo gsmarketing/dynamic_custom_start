@@ -1,3 +1,5 @@
+###### Factorio Mod ######
+
 ## Dynamic Custom Start ##
 Instead of having to try and use the limited options of quick start mods available that aren't aware of other mods that add items to your game that you have running, this mod generates an Item Vault pop-up initially on player spawn where you can select items to add to your inventory to kick-start your game.
 
