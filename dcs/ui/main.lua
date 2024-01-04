@@ -27,15 +27,15 @@ function create_gui(player, inventory_items)
         style = "dcs_deep_frame"
     }
 
-    -- -- Add a text field for item filtering
-    -- local item_filter_field = main_content_frame.add {
-    --     type = "textfield",
-    --     name = "dcs_item_filter_field"
-    -- }
-    -- -- Set the size of the item_filter_field
-    -- item_filter_field.style.minimal_width = 290
-    -- item_filter_field.style.maximal_width = 290
-    -- item_filter_field.style.bottom_margin = 8
+    -- Add a text field for item filtering
+    local item_filter_field = main_content_frame.add {
+        type = "textfield",
+        name = "dcs_item_filter_field"
+    }
+    -- Set the size of the item_filter_field
+    item_filter_field.style.minimal_width = 320
+    item_filter_field.style.maximal_width = 320
+    item_filter_field.style.bottom_margin = 8
 
     -- Create the scroll-pane inside the main content frame
     local item_scroll_pane = main_content_frame.add {
@@ -46,8 +46,8 @@ function create_gui(player, inventory_items)
     }
     -- Set the size of the scroll_pane
     item_scroll_pane.style.minimal_width = 290
-    item_scroll_pane.style.minimal_height = 150
-    item_scroll_pane.style.maximal_height = 150
+    item_scroll_pane.style.minimal_height = 180
+    item_scroll_pane.style.maximal_height = 180
 
     -- Add a table to the scroll-pane
     local sprite_table = item_scroll_pane.add {
@@ -60,13 +60,36 @@ function create_gui(player, inventory_items)
     for i, item in ipairs(inventory_items) do
         local sprite_path = "item/" .. item
         if game.is_valid_sprite_path(sprite_path) then
+            -- Get the localized name of the item
+            local localized_item_name = game.item_prototypes[item].localised_name
+
+            -- Store the localized name in the table
+            global.localized_item_names["dcs_sprite_button_" .. i] = localized_item_name
+
             local sprite_button = sprite_table.add {
                 type = "sprite-button",
                 name = "dcs_sprite_button_" .. i,
-                sprite = sprite_path
+                sprite = sprite_path,
+                tooltip = localized_item_name  -- Set the tooltip to the localized name of the item
             }
         end
     end
+
+    -- -- Add sprite buttons to the table
+    -- for i, item in ipairs(inventory_items) do
+    --     local sprite_path = "item/" .. item
+    --     if game.is_valid_sprite_path(sprite_path) then
+    --         -- Get the localized name of the item
+    --         local localized_item_name = game.item_prototypes[item].localised_name
+
+    --         local sprite_button = sprite_table.add {
+    --             type = "sprite-button",
+    --             name = "dcs_sprite_button_" .. i,
+    --             sprite = sprite_path,
+    --             tooltip = localized_item_name  -- Set the tooltip to the localized name of the item
+    --         }
+    --     end
+    -- end
 
     -- Create a dummy frame for spacing (if needed)
     local v_spacer_frame = main_frame.add {
@@ -76,7 +99,7 @@ function create_gui(player, inventory_items)
     }
     -- Set the size of the v_spacer_frame
     v_spacer_frame.style.width = 1
-    v_spacer_frame.style.minimal_height = 200
+    v_spacer_frame.style.minimal_height = 230
 
     -- Create the content navigation frame
     local content_nav_frame = main_frame.add {
@@ -87,7 +110,7 @@ function create_gui(player, inventory_items)
     }
     -- Set the size of the content_nav_frame
     content_nav_frame.style.minimal_width = 114
-    content_nav_frame.style.minimal_height = 200
+    content_nav_frame.style.minimal_height = 230
 
     -- Create the content controls frame
     local content_controls_frame = content_nav_frame.add {

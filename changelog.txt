@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.1.3
+Date: 04. 01. 2023
+  New Features:
+    - Added simple tooltip to the item vault to show the item's name
+    - Added filter field to sort items by input text
+  Tweak:
+    - Changed the selected item output to the Item Name rather than the internal item_name
+---------------------------------------------------------------------------------------------------
 Version: 0.1.2
 Date: 03. 01. 2023
   Bugfix:

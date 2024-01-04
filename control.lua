@@ -13,6 +13,7 @@ local function cleanup(player)
     -- Clear the globals
     global.selected_item_name = nil
     global.inventory_items = {}
+    global.localized_item_names = {}
     global.dcs_gui_active = false
 end
 
@@ -32,6 +33,9 @@ script.on_init(function()
 
     -- Initialize the inventory items table in global
     global.inventory_items = {}
+
+    -- Create a table to store the localized names of the items
+    global.localized_item_names = {}
 end)
 
 -- This function is called when a new player is created
@@ -80,6 +84,50 @@ script.on_event(defines.events.on_gui_checked_state_changed, function(event)
         else
             -- Disable the close button
             player.gui.screen["dcs_main_frame"]["dcs_content_nav_frame"]["dcs_close_window_frame"]["dcs_shut_vault"].enabled = false
+        end
+    end
+end)
+
+-- Register the on_gui_text_changed event
+script.on_event(defines.events.on_gui_text_changed, function(event)
+    -- Check if the GUI is active
+    if not global.dcs_gui_active then
+        return
+    end
+
+    -- Get the changed element
+    local element = event.element
+
+    -- Check if the changed element is your search field
+    if element.name == "dcs_item_filter_field" then
+        -- Get the text from the search field
+        local search_text = element.text
+
+        -- Get the player who changed the text field
+        local player = game.players[event.player_index]
+
+        -- Get the sprite table
+        local sprite_table = player.gui.screen["dcs_main_frame"]["dcs_main_content_frame"]["dcs_item_scroll_pane"]["dcs_sprite_table"]
+
+        -- Iterate over the children of the sprite table
+        for _, child in pairs(sprite_table.children) do
+            -- Check if the child is a sprite button
+            if child.type == "sprite-button" then
+                -- Get the localized name of the item corresponding to the sprite button
+                local localized_item_name = global.localized_item_names[child.name]
+
+                -- Convert the localized item name to a string
+                local localized_item_name_str = serpent.block(localized_item_name)
+
+                -- Check if the localized item's name contains the search text
+                if localized_item_name_str and string.find(localized_item_name_str, search_text, 1, true) then
+                    -- Show the sprite button
+                    child.visible = true
+                else
+                    -- Hide the sprite button
+                    child.visible = false
+                end
+            end
         end
     end
 end)
@@ -133,11 +181,14 @@ script.on_event(defines.events.on_gui_click, function(event)
             -- Get the name of the corresponding item
             local item_name = global.inventory_items[index]
 
+            -- Get the localized name of the item
+            local localized_item_name = game.item_prototypes[item_name].localised_name
+
             -- Get the localized prefix
             local prefix = {"gui-text.dcs-selected-text"}
 
-            -- Update the caption of the selected_item_label to the name of the selected item
-            selected_item_label.caption = {'', prefix, " ", item_name}
+            -- Update the caption of the selected_item_label to the localized name of the selected item
+            selected_item_label.caption = {'', prefix, " ", localized_item_name}
 
             -- Store the selected item's name in the global table
             global.selected_item_name = item_name
