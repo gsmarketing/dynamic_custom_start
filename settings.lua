@@ -18,5 +18,5 @@ data:extend{
         minimum_value    = 1,
         maximum_value    = 6000,
         order            = "dcs-b"
-    },
+    }
 }
