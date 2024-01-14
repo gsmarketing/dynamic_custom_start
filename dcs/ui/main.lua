@@ -56,40 +56,41 @@ function create_gui(player, inventory_items)
         column_count = 7
     }
 
+    -- Initialize the counter
+    local num_items_added = 0
+
     -- Add sprite buttons to the table
     for i, item in ipairs(inventory_items) do
         local sprite_path = "item/" .. item
         if game.is_valid_sprite_path(sprite_path) then
-            -- Get the localized name of the item
-            local localized_item_name = game.item_prototypes[item].localised_name
+            -- Get the item prototype
+            local item_prototype = game.item_prototypes[item]
 
-            -- Store the localized name in the table
-            global.localized_item_names["dcs_sprite_button_" .. i] = localized_item_name
+            -- Check if the item is hidden and the "dcs-show-hidden-items" setting is false
+            if not (item_prototype.flags and item_prototype.flags["hidden"] and not settings.startup["dcs-show-hidden-items"].value) then
+                -- Get the localized name of the item
+                local localized_item_name = item_prototype.localised_name
 
-            local sprite_button = sprite_table.add {
-                type = "sprite-button",
-                name = "dcs_sprite_button_" .. i,
-                sprite = sprite_path,
-                tooltip = localized_item_name  -- Set the tooltip to the localized name of the item
-            }
+                -- Store the localized name in the table
+                global.localized_item_names["dcs_sprite_button_" .. i] = localized_item_name
+
+                local sprite_button = sprite_table.add {
+                    type = "sprite-button",
+                    name = "dcs_sprite_button_" .. i,
+                    sprite = sprite_path,
+                    tooltip = localized_item_name  -- Set the tooltip to the localized name of the item
+                }
+
+                -- Increment the counter
+                num_items_added = num_items_added + 1
+            end
         end
     end
 
-    -- -- Add sprite buttons to the table
-    -- for i, item in ipairs(inventory_items) do
-    --     local sprite_path = "item/" .. item
-    --     if game.is_valid_sprite_path(sprite_path) then
-    --         -- Get the localized name of the item
-    --         local localized_item_name = game.item_prototypes[item].localised_name
-
-    --         local sprite_button = sprite_table.add {
-    --             type = "sprite-button",
-    --             name = "dcs_sprite_button_" .. i,
-    --             sprite = sprite_path,
-    --             tooltip = localized_item_name  -- Set the tooltip to the localized name of the item
-    --         }
-    --     end
-    -- end
+    -- Print the total number of items added, if debug mode is enabled
+    if global.dcs_debug_mode then
+        game.print("Total number of items added to the sprite table: " .. num_items_added)
+    end
 
     -- Create a dummy frame for spacing (if needed)
     local v_spacer_frame = main_frame.add {

@@ -18,5 +18,12 @@ data:extend{
         minimum_value    = 1,
         maximum_value    = 6000,
         order            = "dcs-b"
+    },
+    {
+        name             = "dcs-show-hidden-items",
+        type             = "bool-setting",
+        setting_type     = "startup",
+        default_value    = true,
+        order            = "dcs-c"
     }
 }

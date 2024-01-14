@@ -19,6 +19,9 @@ end
 
 -- This function is called when the game starts
 script.on_init(function()
+    -- Debug mode flag
+    global.dcs_debug_mode = false
+
     -- Initialize the GUI active flag
     global.dcs_gui_active = false
 
@@ -282,9 +285,24 @@ script.on_event(
 )
 
 -- This function is called when the game's configuration changes
-script.on_configuration_changed(function()
+script.on_configuration_changed(function(data)
     -- Initialize the GUI active flag if it is nil
     if global.dcs_gui_active == nil then
         global.dcs_gui_active = false
+    end
+
+    -- Set debug flag to false if it is nil
+    if global.dcs_debug_mode == nil then
+        global.dcs_debug_mode = false
+    end
+
+    -- New setting in 0.14 (from 0.13)
+    if data.mod_changes and data.mod_changes["dynamic_custom_start"] then
+        -- Initialize the "dcs-show-hidden-items" setting for all players
+        for _, player in pairs(game.players) do
+            if player.mod_settings["dcs-show-hidden-items"] == nil then
+                player.mod_settings["dcs-show-hidden-items"] = {value = true}
+            end
+        end
     end
 end)
