@@ -1,5 +1,7 @@
 -- control.lua
 
+-- Require the Globals module
+local globals = require('dcs.globals')
 -- Require the GUI module
 require('dcs.ui.main')
 
@@ -19,23 +21,14 @@ end
 
 -- This function is called when the game starts
 script.on_init(function()
-    -- Initialize the GUI active flag
-    global.dcs_gui_active = false
+    -- Initialize global variables from the globals table
+    for k, v in pairs(globals) do
+        global[k] = v
+    end
 
-    -- Store the initial tick count
+    -- Initialize dynamic global variables
     global.initial_tick = game.tick
-
-    -- Player table in global
-    global.players = {}
-
-    -- Initialize the max unique items count in global
     global.max_unique_items = settings.startup["dcs-max-unique-items"].value
-
-    -- Initialize the inventory items table in global
-    global.inventory_items = {}
-
-    -- Create a table to store the localized names of the items
-    global.localized_item_names = {}
 end)
 
 -- This function is called when a new player is created
@@ -88,6 +81,74 @@ script.on_event(defines.events.on_gui_checked_state_changed, function(event)
     end
 end)
 
+-- -- Register the on_gui_text_changed event
+-- script.on_event(defines.events.on_gui_text_changed, function(event)
+-- 	-- Check if the GUI is active
+-- 	if not global.dcs_gui_active then
+-- 		return
+-- 	end
+
+-- 	-- Get the changed element
+-- 	local element = event.element
+
+-- 	-- Check if the changed element is your search field
+-- 	if element.name == "dcs_item_filter_field" then
+-- 		-- Get the text from the search field
+-- 		local search_text = element.text
+
+-- 		-- Get the player who changed the text field
+-- 		local player = game.players[event.player_index]
+
+-- 		-- Cancel the previous update if it's still pending
+-- 		if global.update_results_ident then
+-- 			script.on_event(defines.events.on_tick, nil, global.update_results_ident)
+-- 			global.update_results_ident = nil
+-- 		end
+
+-- 		-- Schedule an update in a while
+-- 		global.update_results_ident = script.on_event(defines.events.on_tick, function(current_event)
+-- 			-- Check if the scheduled update is still valid
+-- 			if current_event.tick < global.update_results_ident then
+-- 				return
+-- 			end
+
+-- 			-- Get the sprite table
+-- 			local sprite_table = player.gui.screen["dcs_main_frame"]["dcs_main_content_frame"]["dcs_item_scroll_pane"]["dcs_sprite_table"]
+
+-- 			-- Iterate over the children of the sprite table
+-- 			for _, child in pairs(sprite_table.children) do
+-- 				-- Check if the child is a sprite button
+-- 				if child.type == "sprite-button" then
+-- 					-- Get the localized name of the item corresponding to the sprite button
+-- 					local localized_item_name = global.localized_item_names[child.name]
+
+-- 					-- Convert the localized item name to a string
+-- 					local localized_item_name_str = serpent.block(localized_item_name)
+
+-- 					-- Check if the localized item's name contains the search text
+-- 					if localized_item_name_str and string.find(localized_item_name_str, search_text, 1, true) then
+-- 						-- Show the sprite button
+-- 						child.visible = true
+-- 					else
+-- 						-- Hide the sprite button
+-- 						child.visible = false
+-- 					end
+-- 				end
+-- 			end
+
+-- 			-- Cancel the update
+-- 			script.on_event(defines.events.on_tick, nil, global.update_results_ident)
+-- 			global.update_results_ident = nil
+-- 		end, game.tick + 60)  -- Delay of 60 ticks (1 second)
+
+-- 		-- Update the scheduled update tick
+-- 		global.update_results_ident = game.tick + 60
+-- 	end
+-- end)
+
+-- Initialize a table to store the debounce timers for each player
+global.debounce_timers = {}
+
 -- Register the on_gui_text_changed event
 script.on_event(defines.events.on_gui_text_changed, function(event)
     -- Check if the GUI is active
@@ -104,30 +165,51 @@ script.on_event(defines.events.on_gui_text_changed, function(event)
         local search_text = element.text
 
         -- Get the player who changed the text field
-        local player = game.players[event.player_index]
+        local player_index = event.player_index
 
-        -- Get the sprite table
-        local sprite_table = player.gui.screen["dcs_main_frame"]["dcs_main_content_frame"]["dcs_item_scroll_pane"]["dcs_sprite_table"]
+        -- Update the debounce timer for this player
+        global.debounce_timers[player_index] = {
+            tick = game.tick + 180,  -- Delay of 180 ticks (3 seconds)
+            text = search_text
+        }
+    end
+end)
 
-        -- Iterate over the children of the sprite table
-        for _, child in pairs(sprite_table.children) do
-            -- Check if the child is a sprite button
-            if child.type == "sprite-button" then
-                -- Get the localized name of the item corresponding to the sprite button
-                local localized_item_name = global.localized_item_names[child.name]
+-- Register the on_tick event
+script.on_event(defines.events.on_tick, function(event)
+    -- Iterate over the debounce timers for each player
+    for player_index, timer in pairs(global.debounce_timers) do
+        -- Check if the debounce timer has expired
+        if event.tick >= timer.tick then
+            -- Get the player
+            local player = game.players[player_index]
 
-                -- Convert the localized item name to a string
-                local localized_item_name_str = serpent.block(localized_item_name)
+            -- Get the sprite table
+            local sprite_table = player.gui.screen["dcs_main_frame"]["dcs_main_content_frame"]["dcs_item_scroll_pane"]["dcs_sprite_table"]
 
-                -- Check if the localized item's name contains the search text
-                if localized_item_name_str and string.find(localized_item_name_str, search_text, 1, true) then
-                    -- Show the sprite button
-                    child.visible = true
-                else
-                    -- Hide the sprite button
-                    child.visible = false
+            -- Iterate over the children of the sprite table
+            for _, child in pairs(sprite_table.children) do
+                -- Check if the child is a sprite button
+                if child.type == "sprite-button" then
+                    -- Get the localized name of the item corresponding to the sprite button
+                    local localized_item_name = global.localized_item_names[child.name]
+
+                    -- Convert the localized item name to a string
+                    local localized_item_name_str = serpent.block(localized_item_name)
+
+                    -- Check if the localized item's name contains the search text
+                    if localized_item_name_str and string.find(localized_item_name_str, timer.text, 1, true) then
+                        -- Show the sprite button
+                        child.visible = true
+                    else
+                        -- Hide the sprite button
+                        child.visible = false
+                    end
                 end
             end
+
+            -- Remove the debounce timer for this player
+            global.debounce_timers[player_index] = nil
         end
     end
 end)
@@ -257,6 +339,45 @@ script.on_event(defines.events.on_gui_click, function(event)
 
         -- Call the cleanup function
         cleanup(player)
+    end
+end)
+
+-- Register the on_tick event
+script.on_event(defines.events.on_tick, function(event)
+    -- Iterate over the debounce timers for each player
+    for player_index, timer in pairs(global.debounce_timers) do
+        -- Check if the debounce timer has expired
+        if event.tick >= timer.tick then
+            -- Get the player
+            local player = game.players[player_index]
+
+            -- Get the sprite table
+            local sprite_table = player.gui.screen["dcs_main_frame"]["dcs_main_content_frame"]["dcs_item_scroll_pane"]["dcs_sprite_table"]
+
+            -- Iterate over the children of the sprite table
+            for _, child in pairs(sprite_table.children) do
+                -- Check if the child is a sprite button
+                if child.type == "sprite-button" then
+                    -- Get the localized name of the item corresponding to the sprite button
+                    local localized_item_name = global.localized_item_names[child.name]
+
+                    -- Convert the localized item name to a string
+                    local localized_item_name_str = serpent.block(localized_item_name)
+
+                    -- Check if the localized item's name contains the search text
+                    if localized_item_name_str and string.find(localized_item_name_str, timer.text, 1, true) then
+                        -- Show the sprite button
+                        child.visible = true
+                    else
+                        -- Hide the sprite button
+                        child.visible = false
+                    end
+                end
+            end
+
+            -- Remove the debounce timer for this player
+            global.debounce_timers[player_index] = nil
+        end
     end
 end)
 
