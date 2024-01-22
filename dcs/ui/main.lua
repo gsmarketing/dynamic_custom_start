@@ -49,31 +49,31 @@ function create_gui(player, inventory_items)
     item_scroll_pane.style.minimal_height = 180
     item_scroll_pane.style.maximal_height = 180
 
-    -- Add a table to the scroll-pane
-    local sprite_table = item_scroll_pane.add {
-        type = "table",
-        name = "dcs_sprite_table",
-        column_count = 7
-    }
+	-- Add a table to the scroll-pane
+	local sprite_table = item_scroll_pane.add {
+		type = "table",
+		name = "dcs_sprite_table",
+		column_count = 7
+	}
 
-    -- Add sprite buttons to the table
-    for i, item in ipairs(inventory_items) do
-        local sprite_path = "item/" .. item
-        if game.is_valid_sprite_path(sprite_path) then
-            -- Get the localized name of the item
-            local localized_item_name = game.item_prototypes[item].localised_name
+	-- Add sprite buttons to the table
+	for i, item in ipairs(inventory_items) do
+		local sprite_path = "item/" .. item
+		if game.is_valid_sprite_path(sprite_path) then
+			-- Get the translated name of the item from the dictionary
+			local translated_item_name = flib_dictionary.get(global.localized_item_names[game.players[event.player_index].index], "item_names")[item]
 
-            -- Store the localized name in the table
-            global.localized_item_names["dcs_sprite_button_" .. i] = localized_item_name
-
-            local sprite_button = sprite_table.add {
-                type = "sprite-button",
-                name = "dcs_sprite_button_" .. i,
-                sprite = sprite_path,
-                tooltip = localized_item_name  -- Set the tooltip to the localized name of the item
-            }
-        end
-    end
+			-- Check if the translated name exists
+			if translated_item_name then
+				local sprite_button = sprite_table.add {
+					type = "sprite-button",
+					name = "dcs_sprite_button_" .. i,
+					sprite = sprite_path,
+					tooltip = translated_item_name  -- Set the tooltip to the translated name of the item
+				}
+			end
+		end
+	end
 
     -- -- Add sprite buttons to the table
     -- for i, item in ipairs(inventory_items) do
@@ -81,6 +81,9 @@ function create_gui(player, inventory_items)
     --     if game.is_valid_sprite_path(sprite_path) then
     --         -- Get the localized name of the item
     --         local localized_item_name = game.item_prototypes[item].localised_name
+
+    --         -- Store the localized name in the table
+    --         global.localized_item_names["dcs_sprite_button_" .. i] = localized_item_name
 
     --         local sprite_button = sprite_table.add {
     --             type = "sprite-button",
