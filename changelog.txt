@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.1.5
+Date: 21. 01. 2023
+  Tweak:
+    - Restructured the way filtering works, now uses a small delay before processing input filter to avoid sluggishness
+---------------------------------------------------------------------------------------------------
 Version: 0.1.4
 Date: 14. 01. 2023
   New Features:
