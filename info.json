@@ -1,10 +1,10 @@
 {
     "name": "dynamic_custom_start",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "title": "Dynamic Custom Start",
     "author": "BadCoderDoesBadCode",
     "homepage": "https://github.com/gsmarketing/dynamic_custom_start",
     "description": "Generates an Item Vault at the start of the game where starting items can be selected based on the specified settings values.\n\nNote: This is designed to give a jump start of selected items (regardless of mods installed), once the item vault window is closed it can never be opened again.",
     "factorio_version": "1.1",
-    "dependencies": ["base >= 1.0.0"]
+    "dependencies": ["base >= 1.0.0", "? flib >= 0.14.2"]
 }
