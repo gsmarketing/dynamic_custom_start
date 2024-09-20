@@ -6,8 +6,9 @@ data:extend{
         name             = "dcs-max-unique-items",
         type             = "int-setting",
         setting_type     = "startup",
-        default_value    = 3,
-        allowed_values   = {3, 6, 9, 12, 15, 18, 21, 24},
+        default_value    = 30,
+        minimum_value    = 1,
+        maximum_value    = 500,
         order            = "dcs-a",
     },
     {
